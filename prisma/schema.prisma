@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+  username String  
+  role Role @default(USER) 
+  sneakers Sneaker[]
+  createdAt DateTime @default(now())
+  profile Profile?
+}
+
+model Profile {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  bio String @default("")
+  avatar String?
+  userProfile User @relation(fields: [profileId], references: [id])
+  profileId String @db.ObjectId
+}
+
+model Sneaker {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  brand String 
+  model String
+  season String
+  category String
+  uploads String 
+  owner User @relation(fields: [sneakerId], references: [id])
+  sneakerId String @db.ObjectId
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
