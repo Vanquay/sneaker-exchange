@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +7,42 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+//Oauth Required tables
+model Account {
+  id                  String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId              String  @db.ObjectId @unique
+  type                String
+  provider            String
+  providerAccountId   String
+  refresh_token       String?  @db.String
+  access_token        String?  @db.String
+  expires_at          Int?
+  token_type          String?
+  scope               String?
+  id_token            String?  @db.String
+  session_state       String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken        String   @unique
+  userId              String   @db.ObjectId @unique
+  expires             DateTime
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier          String   @id @map("_id")
+  token               String   @unique
+  expires             DateTime
+
+  @@unique([identifier, token])
 }
 
 model User {
@@ -18,6 +53,8 @@ model User {
   sneakers Sneaker[]
   createdAt DateTime @default(now())
   profile Profile?
+  account Account[]
+  session Session[]
 }
 
 model Profile {
@@ -25,8 +62,9 @@ model Profile {
   bio String @default("")
   avatar String?
   userProfile User @relation(fields: [profileId], references: [id])
-  profileId String @db.ObjectId
+  profileId String @db.ObjectId @unique
 }
+
 
 model Sneaker {
   id String @id @default(auto()) @map("_id") @db.ObjectId
