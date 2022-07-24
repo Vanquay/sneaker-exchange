@@ -3,9 +3,11 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import prisma from '../lib/prisma'
+import HeaderLayout from '../components/header'
 
 const Home: NextPage = () => {
   return (
+    <><HeaderLayout />
     <div className={styles.container}>
       <Head>
         <title>Create Next App</title>
@@ -66,7 +68,7 @@ const Home: NextPage = () => {
           </span>
         </a>
       </footer>
-    </div>
+    </div></>
   )
 }
 
